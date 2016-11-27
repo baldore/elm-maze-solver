@@ -4,9 +4,7 @@ import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput, onClick)
 import Debug exposing (..)
-
-
--- import Lib.Utils exposing (getFromList)
+import Lib.Utils exposing (updateListSize)
 
 
 main : Program Never Model Msg
@@ -87,16 +85,11 @@ updateGrid grid rows cols =
         []
     else
         let
-            rowDiff =
-                rows - List.length grid
+            createEmptyList =
+                \_ -> []
 
             processedRows =
-                if rowDiff == 0 then
-                    grid
-                else if rowDiff > 0 then
-                    grid ++ (List.range 1 rowDiff |> List.map (\_ -> []))
-                else
-                    List.take rows grid
+                updateListSize createEmptyList rows grid
         in
             processedRows |> List.indexedMap (updateRow cols) |> Debug.log "result"
 
@@ -107,24 +100,10 @@ updateRow cols rowIndex row =
         []
     else
         let
-            rowLength =
-                List.length row
-
-            colDiff =
-                cols - rowLength
-
-            processedCols =
-                if colDiff == 0 then
-                    row
-                else if colDiff > 0 then
-                    row
-                        ++ (List.range rowLength (cols - 1)
-                                |> List.map (\colIndex -> Cell { row = rowIndex, col = colIndex })
-                           )
-                else
-                    List.take cols row
+            createRow =
+                \colIndex -> Cell { row = rowIndex, col = colIndex }
         in
-            processedCols
+            updateListSize createRow cols row
 
 
 
