@@ -26,16 +26,11 @@ type alias Cols =
     Int
 
 
-
--- type Cell
---     = Cell
---         { row : Int
---         , col : Int
---         }
-
-
-type alias Cell =
-    Int
+type Cell
+    = Cell
+        { row : Int
+        , col : Int
+        }
 
 
 type alias Grid =
@@ -103,26 +98,29 @@ updateGrid grid rows cols =
                 else
                     List.take rows grid
         in
-            processedRows |> List.map (upgradeRow cols) |> Debug.log "result"
+            processedRows |> List.indexedMap (updateRow cols) |> Debug.log "result"
 
 
-{-|
-TODO: Work on this thing
--}
-upgradeRow : Cols -> List Cell -> List Cell
-upgradeRow cols row =
+updateRow : Cols -> Int -> List Cell -> List Cell
+updateRow cols rowIndex row =
     if cols == 0 then
         []
     else
         let
+            rowLength =
+                List.length row
+
             colDiff =
-                cols - List.length row
+                cols - rowLength
 
             processedCols =
                 if colDiff == 0 then
                     row
                 else if colDiff > 0 then
-                    row ++ (List.range 1 colDiff)
+                    row
+                        ++ (List.range rowLength (cols - 1)
+                                |> List.map (\colIndex -> Cell { row = rowIndex, col = colIndex })
+                           )
                 else
                     List.take cols row
         in
