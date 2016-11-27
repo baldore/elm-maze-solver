@@ -24,11 +24,16 @@ type alias Cols =
     Int
 
 
-type Cell
-    = Cell
-        { row : Int
-        , col : Int
-        }
+type CellType
+    = Wall
+    | Path
+
+
+type alias Cell =
+    { row : Int
+    , col : Int
+    , category : CellType
+    }
 
 
 type alias Grid =
@@ -53,6 +58,7 @@ model =
 type Msg
     = UpdateRows String
     | UpdateCols String
+    | UpdateCell Cell
 
 
 update : Msg -> Model -> Model
@@ -78,6 +84,28 @@ update msg model =
                     , grid = updateGrid model.grid model.rows cols
                 }
 
+        UpdateCell cell ->
+            let
+                w =
+                    cell |> Debug.log "cell"
+            in
+                model
+
+
+createCellWithPos : Int -> Int -> Cell
+createCellWithPos row col =
+    { row = row
+    , col = col
+    , category = Path
+    }
+
+
+changeCellCategory : Cell -> Cell
+changeCellCategory cell =
+    { cell
+        | category = Wall
+    }
+
 
 updateGrid : Grid -> Rows -> Cols -> Grid
 updateGrid grid rows cols =
@@ -91,7 +119,7 @@ updateGrid grid rows cols =
             processedRows =
                 updateListSize createEmptyList rows grid
         in
-            processedRows |> List.indexedMap (updateRow cols) |> Debug.log "result"
+            processedRows |> List.indexedMap (updateRow cols)
 
 
 updateRow : Cols -> Int -> List Cell -> List Cell
@@ -101,23 +129,28 @@ updateRow cols rowIndex row =
     else
         let
             createRow =
-                \colIndex -> Cell { row = rowIndex, col = colIndex }
+                \colIndex -> createCellWithPos rowIndex colIndex
         in
             updateListSize createRow cols row
 
 
+getTable : Grid -> Html Msg
+getTable grid =
+    let
+        makeTrs =
+            grid |> List.map (\row -> tr [] (makeTds row))
 
--- getTable : Grid -> Html Msg
--- getTable grid =
--- let
---     trs =
---         List.range 0 (rows - 1) |> List.map (\row -> tr [] (makeTds row))
---     makeTds row =
---         List.range 0 (cols - 1) |> List.map (makeTd row)
---     makeTd row col =
---         td [] [ button [] [ text (toString ( row, col )) ] ]
--- in
---     table [] trs
+        makeTds =
+            List.map
+                (\cell ->
+                    td []
+                        [ button
+                            [ onClick (UpdateCell cell) ]
+                            [ text (toString cell) ]
+                        ]
+                )
+    in
+        table [] makeTrs
 
 
 view : Model -> Html Msg
@@ -150,5 +183,5 @@ view model =
                 ]
             ]
         , h2 [] [ text "Result" ]
-          -- , getTable model.grid
+        , getTable model.grid
         ]
