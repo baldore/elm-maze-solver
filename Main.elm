@@ -1,7 +1,8 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, button)
-import Html.Events exposing (onClick)
+import Html exposing (..)
+import Html.Attributes as Attr
+import Html.Events exposing (onInput)
 
 
 main : Program Never Model Msg
@@ -14,30 +15,60 @@ main =
 
 
 type alias Model =
-    { counter : Int
+    { rows : Int
+    , cols : Int
     }
 
 
 model : Model
 model =
-    { counter = 0
+    { rows = 0
+    , cols = 0
     }
 
 
 type Msg
-    = Increment
+    = UpdateRows String
+    | UpdateCols String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Increment ->
-            { model | counter = model.counter + 1 }
+        UpdateRows value ->
+            { model | rows = Result.withDefault 0 (String.toInt value) }
+
+        UpdateCols value ->
+            { model | cols = Result.withDefault 0 (String.toInt value) }
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] [ text ("hola mundo genial: " ++ toString (model.counter)) ]
-        , button [ onClick Increment ] [ text "Click me" ]
+        [ h1 [] [ text "Maze Solver" ]
+        , p [] [ text "Please select the rows and columns you want." ]
+        , p [] [ text ("Rows:" ++ toString model.rows) ]
+        , p [] [ text ("Cols:" ++ toString model.cols) ]
+        , div []
+            [ label []
+                [ text "Rows:"
+                , input
+                    [ Attr.type_ "number"
+                    , Attr.min "0"
+                    , Attr.value (toString model.rows)
+                    , onInput UpdateRows
+                    ]
+                    []
+                ]
+            , label []
+                [ text "Cols:"
+                , input
+                    [ Attr.type_ "number"
+                    , Attr.min "0"
+                    , Attr.value (toString model.cols)
+                    , onInput UpdateCols
+                    ]
+                    []
+                ]
+            ]
         ]
