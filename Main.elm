@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes as Attr
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
 
 
 main : Program Never Model Msg
@@ -14,9 +14,17 @@ main =
         }
 
 
+type alias Rows =
+    Int
+
+
+type alias Cols =
+    Int
+
+
 type alias Model =
-    { rows : Int
-    , cols : Int
+    { rows : Rows
+    , cols : Cols
     }
 
 
@@ -30,6 +38,7 @@ model =
 type Msg
     = UpdateRows String
     | UpdateCols String
+    | SelectCell Int Int
 
 
 update : Msg -> Model -> Model
@@ -40,6 +49,24 @@ update msg model =
 
         UpdateCols value ->
             { model | cols = Result.withDefault 0 (String.toInt value) }
+
+        _ ->
+            model
+
+
+getTable : Rows -> Cols -> Html Msg
+getTable rows cols =
+    let
+        trs =
+            List.range 0 (rows - 1) |> List.map (\row -> tr [] (makeTds row))
+
+        makeTds row =
+            List.range 0 (cols - 1) |> List.map (makeTd row)
+
+        makeTd row col =
+            td [] [ button [] [ text (toString ( row, col )) ] ]
+    in
+        table [] trs
 
 
 view : Model -> Html Msg
@@ -71,4 +98,6 @@ view model =
                     []
                 ]
             ]
+        , h2 [] [ text "Result" ]
+        , getTable model.rows model.cols
         ]
