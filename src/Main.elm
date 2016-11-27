@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput, onClick)
+import Debug exposing (..)
 
 
 -- import Lib.Utils exposing (getFromList)
@@ -25,11 +26,16 @@ type alias Cols =
     Int
 
 
-type Cell
-    = Cell
-        { row : Int
-        , col : Int
-        }
+
+-- type Cell
+--     = Cell
+--         { row : Int
+--         , col : Int
+--         }
+
+
+type alias Cell =
+    Int
 
 
 type alias Grid =
@@ -59,38 +65,45 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        UpdateRows value ->
-            { model
-                | rows =
-                    Result.withDefault 0 (String.toInt value)
-                    -- , grid = updateGrid model.grid model.rows model.cols
-            }
+        UpdateRows rowsStr ->
+            let
+                rows =
+                    Result.withDefault 0 (String.toInt rowsStr)
+            in
+                { model
+                    | rows = rows
+                    , grid = updateGrid model.grid rows model.cols
+                }
 
-        UpdateCols value ->
-            { model
-                | cols =
-                    Result.withDefault 0 (String.toInt value)
-                    -- , grid = updateGrid model.grid model.rows model.cols
-            }
+        UpdateCols colsStr ->
+            let
+                cols =
+                    Result.withDefault 0 (String.toInt colsStr)
+            in
+                { model
+                    | cols = cols
+                    , grid = updateGrid model.grid model.rows cols
+                }
+
+
+updateGrid : Grid -> Rows -> Cols -> Grid
+updateGrid grid rows cols =
+    if rows == 0 || cols == 0 then
+        []
+    else
+        let
+            rowDiff =
+                rows - List.length grid
+        in
+            if rowDiff == 0 then
+                grid
+            else if rowDiff > 0 then
+                grid ++ (List.range 1 rowDiff |> List.map (\_ -> []))
+            else
+                List.take rows grid
 
 
 
--- updateGrid : Grid -> Rows -> Cols -> Grid
--- updateGrid grid rows cols =
---     case ( grid, rows, cols ) of
---         ( [], _, _ ) ->
---             []
---         ( _, 0, _ ) ->
---             []
---         ( _, _, _ ) ->
---             []
---         ( grid, _, _ ) ->
---             grid
---         ( _, _, _ ) ->
---             []
--- updateGrid grid rows cols =
--- _ ->
---     model
 -- getTable : Grid -> Html Msg
 -- getTable grid =
 -- let
