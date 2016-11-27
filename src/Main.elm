@@ -94,13 +94,39 @@ updateGrid grid rows cols =
         let
             rowDiff =
                 rows - List.length grid
+
+            processedRows =
+                if rowDiff == 0 then
+                    grid
+                else if rowDiff > 0 then
+                    grid ++ (List.range 1 rowDiff |> List.map (\_ -> []))
+                else
+                    List.take rows grid
         in
-            if rowDiff == 0 then
-                grid
-            else if rowDiff > 0 then
-                grid ++ (List.range 1 rowDiff |> List.map (\_ -> []))
-            else
-                List.take rows grid
+            processedRows |> List.map (upgradeRow cols) |> Debug.log "result"
+
+
+{-|
+TODO: Work on this thing
+-}
+upgradeRow : Cols -> List Cell -> List Cell
+upgradeRow cols row =
+    if cols == 0 then
+        []
+    else
+        let
+            colDiff =
+                cols - List.length row
+
+            processedCols =
+                if colDiff == 0 then
+                    row
+                else if colDiff > 0 then
+                    row ++ (List.range 1 colDiff)
+                else
+                    List.take cols row
+        in
+            processedCols
 
 
 
