@@ -74,10 +74,16 @@ createCellWithPos row col =
     }
 
 
-changeCellCategory : Cell -> Cell
-changeCellCategory cell =
+toggleCellCategory : Cell -> Cell
+toggleCellCategory cell =
     { cell
-        | category = Wall
+        | category =
+            case cell.category of
+                Wall ->
+                    Path
+
+                Path ->
+                    Wall
     }
 
 
@@ -111,6 +117,9 @@ updateRow cols rowIndex row =
 getTable : Grid -> Html Msg
 getTable grid =
     let
+        getButtonClass =
+            \cell -> "grid-button grid-button--" ++ (toString cell.category)
+
         makeTrs =
             grid |> List.map (\row -> tr [] (makeTds row))
 
@@ -119,21 +128,21 @@ getTable grid =
                 (\cell ->
                     td []
                         [ button
-                            [ onClick (UpdateCell (changeCellCategory cell)) ]
-                            [ text (toString cell) ]
+                            [ onClick (UpdateCell (toggleCellCategory cell))
+                            , Attr.class (getButtonClass cell)
+                            ]
+                            []
                         ]
                 )
     in
-        table [] makeTrs
+        table [ Attr.class "grid-table" ] makeTrs
 
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ Attr.class "main-container" ]
         [ h1 [] [ text "Maze Solver" ]
         , p [] [ text "Please select the rows and columns you want." ]
-        , p [] [ text ("Rows:" ++ toString model.rows) ]
-        , p [] [ text ("Cols:" ++ toString model.cols) ]
         , div []
             [ label []
                 [ text "Rows:"
