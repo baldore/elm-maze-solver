@@ -1,5 +1,7 @@
 module Lib.Utils exposing (..)
 
+import Lib.GridTypes exposing (..)
+
 
 getFromList : Int -> List a -> Maybe a
 getFromList index list =
@@ -33,3 +35,23 @@ updateListSize mapNewElements newSize list =
             list ++ (List.range listLength (newSize - 1) |> List.map mapNewElements)
         else
             List.take newSize list
+
+
+updateCell : Grid -> Cell -> Grid
+updateCell grid newCell =
+    let
+        replaceRow =
+            \rowIndex row ->
+                if rowIndex /= newCell.row then
+                    row
+                else
+                    row |> List.indexedMap replaceCell
+
+        replaceCell =
+            \colIndex cell ->
+                if colIndex /= newCell.col then
+                    cell
+                else
+                    newCell
+    in
+        grid |> List.indexedMap replaceRow

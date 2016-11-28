@@ -3,8 +3,8 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput, onClick)
-import Debug exposing (..)
-import Lib.Utils exposing (updateListSize)
+import Lib.Utils exposing (updateListSize, updateCell)
+import Lib.GridTypes exposing (..)
 
 
 main : Program Never Model Msg
@@ -14,30 +14,6 @@ main =
         , view = view
         , update = update
         }
-
-
-type alias Rows =
-    Int
-
-
-type alias Cols =
-    Int
-
-
-type CellType
-    = Wall
-    | Path
-
-
-type alias Cell =
-    { row : Int
-    , col : Int
-    , category : CellType
-    }
-
-
-type alias Grid =
-    List (List Cell)
 
 
 type alias Model =
@@ -85,11 +61,9 @@ update msg model =
                 }
 
         UpdateCell cell ->
-            let
-                w =
-                    cell |> Debug.log "cell"
-            in
-                model
+            { model
+                | grid = updateCell model.grid cell
+            }
 
 
 createCellWithPos : Int -> Int -> Cell
@@ -145,7 +119,7 @@ getTable grid =
                 (\cell ->
                     td []
                         [ button
-                            [ onClick (UpdateCell cell) ]
+                            [ onClick (UpdateCell (changeCellCategory cell)) ]
                             [ text (toString cell) ]
                         ]
                 )
