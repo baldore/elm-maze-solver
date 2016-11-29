@@ -12,6 +12,7 @@ type alias Cols =
 type CellType
     = Wall
     | Path
+    | StartPoint
 
 
 type alias Cell =

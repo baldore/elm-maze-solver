@@ -66,12 +66,20 @@ update msg model =
             }
 
 
+{-|
+
+If row and col are 0, then it creates the initial cell.
+-}
 createCellWithPos : Int -> Int -> Cell
 createCellWithPos row col =
-    { row = row
-    , col = col
-    , category = Path
-    }
+    let
+        category =
+            if row == 0 && col == 0 then
+                StartPoint
+            else
+                Path
+    in
+        { row = row, col = col, category = category }
 
 
 toggleCellCategory : Cell -> Cell
@@ -84,6 +92,9 @@ toggleCellCategory cell =
 
                 Path ->
                     Wall
+
+                other ->
+                    other
     }
 
 
@@ -108,10 +119,10 @@ updateRow cols rowIndex row =
         []
     else
         let
-            createRow =
+            createCell =
                 \colIndex -> createCellWithPos rowIndex colIndex
         in
-            updateListSize createRow cols row
+            updateListSize createCell cols row
 
 
 getTable : Grid -> Html Msg
