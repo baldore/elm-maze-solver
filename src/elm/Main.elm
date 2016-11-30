@@ -3,8 +3,9 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput, onClick)
-import Lib.Utils exposing (updateListSize, updateCell)
+import Lib.Utils exposing (..)
 import Lib.GridTypes exposing (..)
+import Lib.CustomEvents exposing (onRightClick)
 
 
 main : Program Never Model Msg
@@ -35,6 +36,7 @@ type Msg
     = UpdateRows String
     | UpdateCols String
     | UpdateCell Cell
+    | SetEndCell Cell
 
 
 update : Msg -> Model -> Model
@@ -65,64 +67,10 @@ update msg model =
                 | grid = updateCell model.grid cell
             }
 
-
-{-|
-
-If row and col are 0, then it creates the initial cell.
--}
-createCellWithPos : Int -> Int -> Cell
-createCellWithPos row col =
-    let
-        category =
-            if row == 0 && col == 0 then
-                StartPoint
-            else
-                Path
-    in
-        { row = row, col = col, category = category }
-
-
-toggleCellCategory : Cell -> Cell
-toggleCellCategory cell =
-    { cell
-        | category =
-            case cell.category of
-                Wall ->
-                    Path
-
-                Path ->
-                    Wall
-
-                other ->
-                    other
-    }
-
-
-updateGrid : Grid -> Rows -> Cols -> Grid
-updateGrid grid rows cols =
-    if rows == 0 || cols == 0 then
-        []
-    else
-        let
-            createEmptyList =
-                \_ -> []
-
-            processedRows =
-                updateListSize createEmptyList rows grid
-        in
-            processedRows |> List.indexedMap (updateRow cols)
-
-
-updateRow : Cols -> Int -> List Cell -> List Cell
-updateRow cols rowIndex row =
-    if cols == 0 then
-        []
-    else
-        let
-            createCell =
-                \colIndex -> createCellWithPos rowIndex colIndex
-        in
-            updateListSize createCell cols row
+        SetEndCell cell ->
+            { model
+                | grid = setEndCellInGrid cell model.grid
+            }
 
 
 getTable : Grid -> Html Msg
@@ -139,8 +87,9 @@ getTable grid =
                 (\cell ->
                     td []
                         [ button
-                            [ onClick (UpdateCell (toggleCellCategory cell))
-                            , Attr.class (getButtonClass cell)
+                            [ Attr.class (getButtonClass cell)
+                            , onClick (UpdateCell (toggleCellCategory cell))
+                            , onRightClick (SetEndCell cell)
                             ]
                             []
                         ]

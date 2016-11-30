@@ -13,6 +13,7 @@ type CellType
     = Wall
     | Path
     | StartPoint
+    | EndPoint
 
 
 type alias Cell =
