@@ -16,6 +16,15 @@ type CellType
     | EndPoint
 
 
+{-|
+This type is used in the algorithm to avoid reprocessing of the same cell
+-}
+type CellStatus
+    = Ready
+    | Waiting
+    | Processed
+
+
 type alias Cell =
     { row : Int
     , col : Int
