@@ -102,10 +102,22 @@ view : Model -> Html Msg
 view model =
     div [ Attr.class "main-container" ]
         [ h1 [] [ text "Maze Solver" ]
-        , p [] [ text "Please select the rows and columns you want." ]
-        , div []
+        , p []
+            [ text """
+              Please select the rows and columns you want.
+              Left click in the squares to toggle between a path (white) or
+              a wall (blue).
+              The green square is the start point and always be located in that
+              corner.
+              Use right click to set the end point.
+              """
+            ]
+        , p []
+            [ button [] [ text "Calculate shortest path" ]
+            ]
+        , p []
             [ label []
-                [ text "Rows:"
+                [ span [ Attr.class "field-label" ] [ text "Rows:" ]
                 , input
                     [ Attr.type_ "number"
                     , Attr.min "0"
@@ -114,8 +126,10 @@ view model =
                     ]
                     []
                 ]
-            , label []
-                [ text "Cols:"
+            ]
+        , p []
+            [ label []
+                [ span [ Attr.class "field-label" ] [ text "Cols:" ]
                 , input
                     [ Attr.type_ "number"
                     , Attr.min "0"
