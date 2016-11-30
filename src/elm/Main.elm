@@ -3,9 +3,9 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes as Attr
 import Html.Events exposing (onInput, onClick)
-import Lib.Utils exposing (..)
-import Lib.GridTypes exposing (..)
 import Lib.CustomEvents exposing (onRightClick)
+import Lib.GridHelpers exposing (..)
+import Lib.GridTypes exposing (..)
 
 
 main : Program Never Model Msg

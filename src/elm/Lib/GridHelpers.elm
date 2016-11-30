@@ -1,10 +1,9 @@
-module Lib.Utils exposing (..)
+module Lib.GridHelpers exposing (..)
 
 import Lib.GridTypes exposing (..)
 
 
 {-|
-TODO: Add documentation.
 The new elements will be mapped using the index of the new element.
 -}
 updateListSize : (Int -> a) -> Int -> List a -> List a
@@ -44,21 +43,6 @@ updateCell grid newCell =
         grid |> List.indexedMap replaceRow
 
 
-{-|
-If row and col are 0, then it creates the initial cell.
--}
-createCellWithPos : Int -> Int -> Cell
-createCellWithPos row col =
-    let
-        category =
-            if row == 0 && col == 0 then
-                StartPoint
-            else
-                Path
-    in
-        { row = row, col = col, category = category }
-
-
 updateGrid : Grid -> Rows -> Cols -> Grid
 updateGrid grid rows cols =
     if rows == 0 || cols == 0 then
@@ -80,6 +64,18 @@ updateRow cols rowIndex row =
         []
     else
         let
+            createCellWithPos =
+                \row col ->
+                    { row = row
+                    , col = col
+                    , category =
+                        -- Here is where we define the start point
+                        if row == 0 && col == 0 then
+                            StartPoint
+                        else
+                            Path
+                    }
+
             createCell =
                 \colIndex -> createCellWithPos rowIndex colIndex
         in
