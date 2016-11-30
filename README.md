@@ -4,7 +4,8 @@ Create your own maze and see what is the shortest path.
 
 ## TODO
 
--[ ] Read the article and (hopefully) understand the algorithm.
+-[x] Read the article and (hopefully) understand the algorithm.
+-[ ] Implement the algorithm.
 
 ## Thanks
 
