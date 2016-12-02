@@ -6,7 +6,7 @@ import Lib.SolveMazeTest as SolveMaze
 
 all : Test
 all =
-    describe "String.reverse"
+    describe "Maze Solver"
         -- Nest as many descriptions as you like.
         [ SolveMaze.all
         ]
