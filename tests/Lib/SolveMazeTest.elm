@@ -149,5 +149,61 @@ all =
                         Expect.equal
                             (SolveMaze.getNeighbors cell grid)
                             expected
+            , test "get neighbors from the center" <|
+                \() ->
+                    let
+                        cell =
+                            Cell 2 2 Path
+
+                        grid =
+                            createGrid
+                                [ "....."
+                                , "....."
+                                , "..S.."
+                                , "....."
+                                , "....."
+                                ]
+
+                        expected =
+                            [ Cell 1 1 Path
+                            , Cell 1 2 Path
+                            , Cell 1 3 Path
+                            , Cell 2 1 Path
+                            , Cell 2 3 Path
+                            , Cell 3 1 Path
+                            , Cell 3 2 Path
+                            , Cell 3 3 Path
+                            ]
+                    in
+                        Expect.equal
+                            (SolveMaze.getNeighbors cell grid)
+                            expected
+            , test "ignore walls" <|
+                \() ->
+                    let
+                        cell =
+                            Cell 2 2 Path
+
+                        grid =
+                            createGrid
+                                [ "....."
+                                , "...X."
+                                , "..S.."
+                                , ".X..."
+                                , "....."
+                                ]
+
+                        expected =
+                            [ Cell 1 1 Path
+                            , Cell 1 2 Path
+                            , Cell 2 1 Path
+                            , Cell 2 3 Path
+                            , Cell 3 2 Path
+                            , Cell 3 3 Path
+                            ]
+                    in
+                        Expect.equal
+                            (SolveMaze.getNeighbors cell grid)
+                            expected
             ]
         ]
