@@ -6,6 +6,11 @@ import Lib.SolveMaze as SolveMaze
 import Lib.GridTypes exposing (..)
 
 
+pathCell : Int -> Int -> Cell
+pathCell row col =
+    Cell row col Path
+
+
 {-|
 Helper for cell creation.
 -}
@@ -65,7 +70,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 0 0 Path
+                            pathCell 0 0
 
                         grid =
                             createGrid
@@ -75,9 +80,9 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 0 1 Path
-                            , Cell 1 0 Path
-                            , Cell 1 1 Path
+                            [ pathCell 0 1
+                            , pathCell 1 0
+                            , pathCell 1 1
                             ]
                     in
                         Expect.equal
@@ -87,7 +92,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 2 0 Path
+                            pathCell 2 0
 
                         grid =
                             createGrid
@@ -97,9 +102,9 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 1 0 Path
-                            , Cell 1 1 Path
-                            , Cell 2 1 Path
+                            [ pathCell 1 0
+                            , pathCell 1 1
+                            , pathCell 2 1
                             ]
                     in
                         Expect.equal
@@ -109,7 +114,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 2 2 Path
+                            pathCell 2 2
 
                         grid =
                             createGrid
@@ -119,9 +124,9 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 1 1 Path
-                            , Cell 1 2 Path
-                            , Cell 2 1 Path
+                            [ pathCell 1 1
+                            , pathCell 1 2
+                            , pathCell 2 1
                             ]
                     in
                         Expect.equal
@@ -131,7 +136,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 0 2 Path
+                            pathCell 0 2
 
                         grid =
                             createGrid
@@ -141,9 +146,9 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 0 1 Path
-                            , Cell 1 1 Path
-                            , Cell 1 2 Path
+                            [ pathCell 0 1
+                            , pathCell 1 1
+                            , pathCell 1 2
                             ]
                     in
                         Expect.equal
@@ -153,7 +158,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 2 2 Path
+                            pathCell 2 2
 
                         grid =
                             createGrid
@@ -165,14 +170,14 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 1 1 Path
-                            , Cell 1 2 Path
-                            , Cell 1 3 Path
-                            , Cell 2 1 Path
-                            , Cell 2 3 Path
-                            , Cell 3 1 Path
-                            , Cell 3 2 Path
-                            , Cell 3 3 Path
+                            [ pathCell 1 1
+                            , pathCell 1 2
+                            , pathCell 1 3
+                            , pathCell 2 1
+                            , pathCell 2 3
+                            , pathCell 3 1
+                            , pathCell 3 2
+                            , pathCell 3 3
                             ]
                     in
                         Expect.equal
@@ -182,7 +187,7 @@ all =
                 \() ->
                     let
                         cell =
-                            Cell 2 2 Path
+                            pathCell 2 2
 
                         grid =
                             createGrid
@@ -194,12 +199,12 @@ all =
                                 ]
 
                         expected =
-                            [ Cell 1 1 Path
-                            , Cell 1 2 Path
-                            , Cell 2 1 Path
-                            , Cell 2 3 Path
-                            , Cell 3 2 Path
-                            , Cell 3 3 Path
+                            [ pathCell 1 1
+                            , pathCell 1 2
+                            , pathCell 2 1
+                            , pathCell 2 3
+                            , pathCell 3 2
+                            , pathCell 3 3
                             ]
                     in
                         Expect.equal
