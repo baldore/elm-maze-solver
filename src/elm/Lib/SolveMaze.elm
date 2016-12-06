@@ -3,6 +3,22 @@ module Lib.SolveMaze exposing (..)
 import Lib.GridTypes exposing (..)
 
 
+type Status
+    = Ready
+    | Waiting
+
+
+type alias StatusCell =
+    { cell : Cell
+    , status : Status
+    }
+
+
+solveMaze : Grid -> List Cell
+solveMaze grid =
+    []
+
+
 {-|
 Returns a list with the neighbors of the cell.
 -}
@@ -44,6 +60,8 @@ getNeighbors cell grid =
             |> filterNeighbors
 
 
-solveMaze : Grid -> List Cell
-solveMaze grid =
-    []
+gridToStatusCellGrid : Grid -> List (List StatusCell)
+gridToStatusCellGrid grid =
+    grid
+        |> List.map
+            (\row -> row |> List.map (\cell -> StatusCell cell Ready))

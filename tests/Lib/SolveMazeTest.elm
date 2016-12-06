@@ -2,7 +2,7 @@ module Lib.SolveMazeTest exposing (..)
 
 import Test exposing (..)
 import Expect
-import Lib.SolveMaze as SolveMaze
+import Lib.SolveMaze exposing (..)
 import Lib.GridTypes exposing (..)
 
 
@@ -86,7 +86,7 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
                             expected
             , test "get neighbors from the bottom left corner" <|
                 \() ->
@@ -108,7 +108,7 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
                             expected
             , test "get neighbors from the bottom right corner" <|
                 \() ->
@@ -130,7 +130,7 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
                             expected
             , test "get neighbors from the top right corner" <|
                 \() ->
@@ -152,7 +152,7 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
                             expected
             , test "get neighbors from the center" <|
                 \() ->
@@ -181,7 +181,7 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
                             expected
             , test "ignore walls" <|
                 \() ->
@@ -208,7 +208,30 @@ all =
                             ]
                     in
                         Expect.equal
-                            (SolveMaze.getNeighbors cell grid)
+                            (getNeighbors cell grid)
+                            expected
+            ]
+        , describe "gridToStatusCellGrid"
+            [ test "should convert a grid of Cell in a grid of StatusCell" <|
+                \() ->
+                    let
+                        grid =
+                            createGrid
+                                [ ".."
+                                , ".."
+                                ]
+
+                        expected =
+                            [ [ StatusCell (Cell 0 0 Path) Ready
+                              , StatusCell (Cell 0 1 Path) Ready
+                              ]
+                            , [ StatusCell (Cell 1 0 Path) Ready
+                              , StatusCell (Cell 1 1 Path) Ready
+                              ]
+                            ]
+                    in
+                        Expect.equal
+                            (gridToStatusCellGrid grid)
                             expected
             ]
         ]
