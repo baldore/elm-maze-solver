@@ -1,17 +1,7 @@
 module Lib.SolveMaze exposing (..)
 
 import Lib.GridTypes exposing (..)
-
-
-type Status
-    = Ready
-    | Waiting
-
-
-type alias StatusCell =
-    { cell : Cell
-    , status : Status
-    }
+import Dict
 
 
 solveMaze : Grid -> List Cell
@@ -19,49 +9,43 @@ solveMaze grid =
     []
 
 
-{-|
-Returns a list with the neighbors of the cell.
--}
-getNeighbors : Cell -> Grid -> List Cell
-getNeighbors cell grid =
-    let
-        rowIncrement =
-            if cell.row == 0 then
-                2
-            else
-                1
-
-        colIncrement =
-            if cell.col == 0 then
-                2
-            else
-                1
-
-        filterNeighbors =
-            List.filter
-                (\neighbor ->
-                    not (neighbor.row == cell.row && neighbor.col == cell.col)
-                        && (neighbor.category /= Wall)
-                )
-
-        neighborRows =
-            grid
-                |> List.drop (cell.row - 1)
-                |> List.take (cell.row + rowIncrement)
-
-        getNeighborCells =
-            \row ->
-                row
-                    |> List.drop (cell.col - 1)
-                    |> List.take (cell.col + colIncrement)
-    in
-        neighborRows
-            |> List.concatMap getNeighborCells
-            |> filterNeighbors
+flatGrid : Grid -> List Cell
+flatGrid =
+    List.concat
 
 
-gridToStatusCellGrid : Grid -> List (List StatusCell)
-gridToStatusCellGrid grid =
-    grid
-        |> List.map
-            (\row -> row |> List.map (\cell -> StatusCell cell Ready))
+areNeighbors : Cell -> Cell -> Bool
+areNeighbors c1 c2 =
+    if (c1.category == Wall || c2.category == Wall) then
+        False
+    else if (c1.row == c2.row) then
+        abs (c1.col - c2.col) == 1
+    else if (c1.col == c2.col) then
+        abs (c1.row - c2.row) == 1
+    else
+        False
+
+
+
+-- if (c1.row == c2.row) then
+--   abs (c1.col - c2.col) == 1
+-- else if (c1.col == c2.row) then
+-- getNeighbors :
+--     Dict.Dict ( Int, Int ) ( Int, Int )
+--     -> Cell
+--     -> List Cell
+--     -> ( Dict.Dict ( Int, Int ) ( Int, Int ), List Cell, List Cell )
+-- getNeighbors acc originCell flattenGrid =
+--     let
+--         areNeighbors =
+--           \c1 c2 ->
+--
+--         extractNeighbors =
+--           \(acc, neighbors, gridRest) cell ->
+--               -- If it's the same, we just ignore it
+--               if (originCell.row == cell.row && originCell.col == cell.col) then
+--                   (acc, neighbors, gridRest)
+--               else if (areNeighbors(originCell, cell))
+--
+--     in
+--         List.foldl extractNeighbors (Dict.empty, [], []) flattenGrid

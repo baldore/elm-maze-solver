@@ -2,13 +2,12 @@ module Lib.SolveMazeTest exposing (..)
 
 import Test exposing (..)
 import Expect
+
+
+-- import Dict
+
 import Lib.SolveMaze exposing (..)
 import Lib.GridTypes exposing (..)
-
-
-pathCell : Int -> Int -> Cell
-pathCell row col =
-    Cell row col Path
 
 
 {-|
@@ -65,173 +64,80 @@ createGrid chars =
 all : Test
 all =
     describe "SolveMaze"
-        [ describe "getNeighbors"
-            [ test "get neighbors from the top left corner" <|
+        [ describe "flatGrid"
+            [ test "should convert a grid in a list of cells" <|
                 \() ->
                     let
-                        cell =
-                            pathCell 0 0
-
                         grid =
                             createGrid
-                                [ "S.."
-                                , "..."
-                                , "..."
+                                [ "S."
+                                , ".E"
                                 ]
 
                         expected =
-                            [ pathCell 0 1
-                            , pathCell 1 0
-                            , pathCell 1 1
+                            [ Cell 0 0 StartPoint
+                            , Cell 0 1 Path
+                            , Cell 1 0 Path
+                            , Cell 1 1 EndPoint
                             ]
                     in
                         Expect.equal
-                            (getNeighbors cell grid)
-                            expected
-            , test "get neighbors from the bottom left corner" <|
-                \() ->
-                    let
-                        cell =
-                            pathCell 2 0
-
-                        grid =
-                            createGrid
-                                [ "..."
-                                , "..."
-                                , "S.."
-                                ]
-
-                        expected =
-                            [ pathCell 1 0
-                            , pathCell 1 1
-                            , pathCell 2 1
-                            ]
-                    in
-                        Expect.equal
-                            (getNeighbors cell grid)
-                            expected
-            , test "get neighbors from the bottom right corner" <|
-                \() ->
-                    let
-                        cell =
-                            pathCell 2 2
-
-                        grid =
-                            createGrid
-                                [ "..."
-                                , "..."
-                                , "..S"
-                                ]
-
-                        expected =
-                            [ pathCell 1 1
-                            , pathCell 1 2
-                            , pathCell 2 1
-                            ]
-                    in
-                        Expect.equal
-                            (getNeighbors cell grid)
-                            expected
-            , test "get neighbors from the top right corner" <|
-                \() ->
-                    let
-                        cell =
-                            pathCell 0 2
-
-                        grid =
-                            createGrid
-                                [ "..S"
-                                , "..."
-                                , "..."
-                                ]
-
-                        expected =
-                            [ pathCell 0 1
-                            , pathCell 1 1
-                            , pathCell 1 2
-                            ]
-                    in
-                        Expect.equal
-                            (getNeighbors cell grid)
-                            expected
-            , test "get neighbors from the center" <|
-                \() ->
-                    let
-                        cell =
-                            pathCell 2 2
-
-                        grid =
-                            createGrid
-                                [ "....."
-                                , "....."
-                                , "..S.."
-                                , "....."
-                                , "....."
-                                ]
-
-                        expected =
-                            [ pathCell 1 1
-                            , pathCell 1 2
-                            , pathCell 1 3
-                            , pathCell 2 1
-                            , pathCell 2 3
-                            , pathCell 3 1
-                            , pathCell 3 2
-                            , pathCell 3 3
-                            ]
-                    in
-                        Expect.equal
-                            (getNeighbors cell grid)
-                            expected
-            , test "ignore walls" <|
-                \() ->
-                    let
-                        cell =
-                            pathCell 2 2
-
-                        grid =
-                            createGrid
-                                [ "....."
-                                , "...X."
-                                , "..S.."
-                                , ".X..."
-                                , "....."
-                                ]
-
-                        expected =
-                            [ pathCell 1 1
-                            , pathCell 1 2
-                            , pathCell 2 1
-                            , pathCell 2 3
-                            , pathCell 3 2
-                            , pathCell 3 3
-                            ]
-                    in
-                        Expect.equal
-                            (getNeighbors cell grid)
+                            (flatGrid grid)
                             expected
             ]
-        , describe "gridToStatusCellGrid"
-            [ test "should convert a grid of Cell in a grid of StatusCell" <|
-                \() ->
-                    let
-                        grid =
-                            createGrid
-                                [ ".."
-                                , ".."
-                                ]
-
-                        expected =
-                            [ [ StatusCell (Cell 0 0 Path) Ready
-                              , StatusCell (Cell 0 1 Path) Ready
-                              ]
-                            , [ StatusCell (Cell 1 0 Path) Ready
-                              , StatusCell (Cell 1 1 Path) Ready
-                              ]
-                            ]
-                    in
-                        Expect.equal
-                            (gridToStatusCellGrid grid)
-                            expected
+        , describe "areNeighbors"
+            [ test "should return true if the cells are neighbors" <|
+                Expect.all
+                    [ \() -> Expect.equal (areNeighbors (Cell 1 1 Path) (Cell 0 1 Path)) True
+                    , \() -> Expect.equal (areNeighbors (Cell 1 1 Path) (Cell 1 0 Path)) True
+                    , \() -> Expect.equal (areNeighbors (Cell 1 1 Path) (Cell 1 2 Path)) True
+                    , \() -> Expect.equal (areNeighbors (Cell 1 1 Path) (Cell 2 1 Path)) True
+                    ]
+            , test "should return false if the cells are not neighbors" <|
+                Expect.all
+                    [ \() -> Expect.equal (areNeighbors (Cell 0 0 Path) (Cell 1 1 Path)) False
+                    , \() -> Expect.equal (areNeighbors (Cell 0 0 Path) (Cell 2 0 Path)) False
+                    ]
+            , test "should return false if the cell is the same" <|
+                \() -> Expect.equal (areNeighbors (Cell 0 0 Path) (Cell 0 0 Path)) False
+            , test "should return false if the cell is a wall" <|
+                \() -> Expect.equal (areNeighbors (Cell 0 0 Path) (Cell 0 1 Wall)) False
             ]
+          -- , describe "getNeighbors"
+          --     [ test "should return the neighbors with the origin of them and the rest of the cells" <|
+          --         \() ->
+          --             let
+          --                 originCell =
+          --                     Cell 1 1 StartPoint
+          --
+          --                 grid =
+          --                     createGrid
+          --                         [ "..."
+          --                         , ".S."
+          --                         , "..."
+          --                         ]
+          --
+          --                 expected =
+          --                     ( Dict.fromList
+          --                         [ ( ( 0, 1 ), ( 1, 1 ) )
+          --                         , ( ( 1, 0 ), ( 1, 1 ) )
+          --                         , ( ( 1, 2 ), ( 1, 1 ) )
+          --                         , ( ( 2, 1 ), ( 1, 1 ) )
+          --                         ]
+          --                     , [ Cell 0 1 Path
+          --                       , Cell 1 0 Path
+          --                       , Cell 1 2 Path
+          --                       , Cell 2 1 Path
+          --                       ]
+          --                     , [ Cell 0 0 Path
+          --                       , Cell 0 2 Path
+          --                       , Cell 2 0 Path
+          --                       , Cell 2 2 Path
+          --                       ]
+          --                     )
+          --             in
+          --                 Expect.equal
+          --                     (getNeighbors Dict.empty originCell (flatGrid grid))
+          --                     expected
+          -- ]
         ]
