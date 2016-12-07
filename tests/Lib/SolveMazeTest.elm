@@ -2,10 +2,7 @@ module Lib.SolveMazeTest exposing (..)
 
 import Test exposing (..)
 import Expect
-
-
--- import Dict
-
+import Dict
 import Lib.SolveMaze exposing (..)
 import Lib.GridTypes exposing (..)
 
@@ -103,41 +100,41 @@ all =
             , test "should return false if the cell is a wall" <|
                 \() -> Expect.equal (areNeighbors (Cell 0 0 Path) (Cell 0 1 Wall)) False
             ]
-          -- , describe "getNeighbors"
-          --     [ test "should return the neighbors with the origin of them and the rest of the cells" <|
-          --         \() ->
-          --             let
-          --                 originCell =
-          --                     Cell 1 1 StartPoint
-          --
-          --                 grid =
-          --                     createGrid
-          --                         [ "..."
-          --                         , ".S."
-          --                         , "..."
-          --                         ]
-          --
-          --                 expected =
-          --                     ( Dict.fromList
-          --                         [ ( ( 0, 1 ), ( 1, 1 ) )
-          --                         , ( ( 1, 0 ), ( 1, 1 ) )
-          --                         , ( ( 1, 2 ), ( 1, 1 ) )
-          --                         , ( ( 2, 1 ), ( 1, 1 ) )
-          --                         ]
-          --                     , [ Cell 0 1 Path
-          --                       , Cell 1 0 Path
-          --                       , Cell 1 2 Path
-          --                       , Cell 2 1 Path
-          --                       ]
-          --                     , [ Cell 0 0 Path
-          --                       , Cell 0 2 Path
-          --                       , Cell 2 0 Path
-          --                       , Cell 2 2 Path
-          --                       ]
-          --                     )
-          --             in
-          --                 Expect.equal
-          --                     (getNeighbors Dict.empty originCell (flatGrid grid))
-          --                     expected
-          -- ]
+        , describe "getNeighbors"
+            [ test "should return the neighbors with the origin of them and the rest of the cells" <|
+                \() ->
+                    let
+                        originCell =
+                            Cell 1 1 StartPoint
+
+                        grid =
+                            createGrid
+                                [ "..."
+                                , ".S."
+                                , "..."
+                                ]
+
+                        expected =
+                            ( Dict.fromList
+                                [ ( ( 0, 1 ), ( 1, 1 ) )
+                                , ( ( 1, 0 ), ( 1, 1 ) )
+                                , ( ( 1, 2 ), ( 1, 1 ) )
+                                , ( ( 2, 1 ), ( 1, 1 ) )
+                                ]
+                            , [ Cell 0 1 Path
+                              , Cell 1 0 Path
+                              , Cell 1 2 Path
+                              , Cell 2 1 Path
+                              ]
+                            , [ Cell 0 0 Path
+                              , Cell 0 2 Path
+                              , Cell 2 0 Path
+                              , Cell 2 2 Path
+                              ]
+                            )
+                    in
+                        Expect.equal
+                            (getNeighbors Dict.empty originCell (flatGrid grid))
+                            expected
+            ]
         ]
