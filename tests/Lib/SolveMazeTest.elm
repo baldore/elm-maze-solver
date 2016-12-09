@@ -136,5 +136,35 @@ all =
                         Expect.equal
                             (getNeighbors Dict.empty originCell (flatGrid grid))
                             expected
+            , test "should return empty values if there's no neighbors" <|
+                \() ->
+                    let
+                        originCell =
+                            Cell 0 0 StartPoint
+
+                        grid =
+                            createGrid
+                                [ "SX."
+                                , "XX."
+                                , "..."
+                                ]
+
+                        expected =
+                            ( Dict.empty
+                            , []
+                            , [ Cell 0 1 Wall
+                              , Cell 0 2 Path
+                              , Cell 1 0 Wall
+                              , Cell 1 1 Wall
+                              , Cell 1 2 Path
+                              , Cell 2 0 Path
+                              , Cell 2 1 Path
+                              , Cell 2 2 Path
+                              ]
+                            )
+                    in
+                        Expect.equal
+                            (getNeighbors Dict.empty originCell (flatGrid grid))
+                            expected
             ]
         ]
