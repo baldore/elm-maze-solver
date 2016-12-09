@@ -116,10 +116,11 @@ all =
 
                         expected =
                             ( Dict.fromList
-                                [ ( ( 0, 1 ), ( 1, 1 ) )
-                                , ( ( 1, 0 ), ( 1, 1 ) )
-                                , ( ( 1, 2 ), ( 1, 1 ) )
-                                , ( ( 2, 1 ), ( 1, 1 ) )
+                                [ ( ( 1, 1 ), Nothing )
+                                , ( ( 0, 1 ), Just ( 1, 1 ) )
+                                , ( ( 1, 0 ), Just ( 1, 1 ) )
+                                , ( ( 1, 2 ), Just ( 1, 1 ) )
+                                , ( ( 2, 1 ), Just ( 1, 1 ) )
                                 ]
                             , [ Cell 0 1 Path
                               , Cell 1 0 Path
@@ -140,11 +141,11 @@ all =
                 \() ->
                     let
                         originCell =
-                            Cell 0 0 StartPoint
+                            Cell 0 0 Path
 
                         grid =
                             createGrid
-                                [ "SX."
+                                [ ".X."
                                 , "XX."
                                 , "..."
                                 ]
@@ -165,6 +166,38 @@ all =
                     in
                         Expect.equal
                             (getNeighbors Dict.empty originCell (flatGrid grid))
+                            expected
+            ]
+        , describe "getOrigins"
+            [ test "should return the origins of the whole grid" <|
+                \() ->
+                    let
+                        initialQueue =
+                            [ Cell 0 0 StartPoint ]
+
+                        flattenGrid =
+                            createGrid
+                                [ "S.."
+                                , "..."
+                                , "..."
+                                ]
+                                |> flatGrid
+
+                        expected =
+                            Dict.fromList
+                                [ ( ( 0, 0 ), Nothing )
+                                , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                , ( ( 1, 0 ), Just ( 0, 0 ) )
+                                , ( ( 0, 2 ), Just ( 0, 1 ) )
+                                , ( ( 1, 1 ), Just ( 0, 1 ) )
+                                , ( ( 2, 0 ), Just ( 1, 0 ) )
+                                , ( ( 1, 2 ), Just ( 0, 2 ) )
+                                , ( ( 2, 1 ), Just ( 1, 1 ) )
+                                , ( ( 2, 2 ), Just ( 1, 2 ) )
+                                ]
+                    in
+                        Expect.equal
+                            (getOrigins flattenGrid initialQueue)
                             expected
             ]
         ]
