@@ -22,6 +22,7 @@ type alias Model =
     { rows : Rows
     , cols : Cols
     , grid : Grid
+    , controlsDisabled : Bool
     }
 
 
@@ -30,6 +31,7 @@ initialModel =
     { rows = 0
     , cols = 0
     , grid = []
+    , controlsDisabled = False
     }
 
 
@@ -66,25 +68,35 @@ update msg model =
                 }
 
         UpdateCell cell ->
-            { model
-                | grid = updateCell model.grid cell
-            }
+            if (model.controlsDisabled) then
+                model
+            else
+                { model
+                    | grid = updateCell model.grid cell
+                }
 
         SetEndCell cell ->
-            { model
-                | grid = setEndCellInGrid cell model.grid
-            }
+            if (model.controlsDisabled) then
+                model
+            else
+                { model
+                    | grid = setEndCellInGrid cell model.grid
+                }
 
         SolveMaze ->
-            { model
-                | grid =
-                    case solveMaze model.grid of
-                        Err _ ->
-                            model.grid
+            if (model.controlsDisabled) then
+                model
+            else
+                { model
+                    | controlsDisabled = True
+                    , grid =
+                        case solveMaze model.grid of
+                            Err _ ->
+                                model.grid
 
-                        Ok solvedGrid ->
-                            solvedGrid
-            }
+                            Ok solvedGrid ->
+                                solvedGrid
+                }
 
         RestartAll ->
             initialModel
@@ -93,6 +105,13 @@ update msg model =
 getTable : Grid -> Html Msg
 getTable grid =
     let
+        gridVisible =
+            (List.length grid > 0)
+                && (List.head grid
+                        |> Maybe.map (\row -> List.length row > 0)
+                        |> Maybe.withDefault False
+                   )
+
         getButtonClass =
             \cell -> "grid-button grid-button--" ++ (toString cell.category)
 
@@ -112,7 +131,13 @@ getTable grid =
                         ]
                 )
     in
-        table [ Attr.class "grid-table" ] makeTrs
+        if (gridVisible) then
+            div []
+                [ h2 [] [ text "Result" ]
+                , table [ Attr.class "grid-table" ] makeTrs
+                ]
+        else
+            text ""
 
 
 view : Model -> Html Msg
@@ -130,8 +155,15 @@ view model =
               """
             ]
         , p []
-            [ button [ onClick SolveMaze ] [ text "Show solution" ]
-            , button [ onClick RestartAll ] [ text "Restart" ]
+            [ button
+                [ onClick SolveMaze
+                , Attr.disabled model.controlsDisabled
+                ]
+                [ text "Show solution" ]
+            , button
+                [ onClick RestartAll
+                ]
+                [ text "Restart" ]
             ]
         , p []
             [ label []
@@ -140,6 +172,7 @@ view model =
                     [ Attr.type_ "number"
                     , Attr.min "0"
                     , Attr.value (toString model.rows)
+                    , Attr.disabled model.controlsDisabled
                     , onInput UpdateRows
                     ]
                     []
@@ -152,11 +185,11 @@ view model =
                     [ Attr.type_ "number"
                     , Attr.min "0"
                     , Attr.value (toString model.cols)
+                    , Attr.disabled model.controlsDisabled
                     , onInput UpdateCols
                     ]
                     []
                 ]
             ]
-        , h2 [] [ text "Result" ]
         , getTable model.grid
         ]
