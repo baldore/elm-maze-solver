@@ -22,6 +22,22 @@ type alias CellOrigins =
     Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
 
 
+{-|
+Returns the first element that meets the requirements of the function.
+-}
+findInList : (a -> Bool) -> List a -> Maybe a
+findInList condition list =
+    case list of
+        [] ->
+            Nothing
+
+        head :: tail ->
+            if (condition (head)) then
+                Just head
+            else
+                findInList condition tail
+
+
 solveMaze : Grid -> List Cell
 solveMaze grid =
     []
@@ -85,16 +101,16 @@ getNeighbors originAcc originCell flattenGrid =
             List.foldr extractNeighbors (GetNeighborsResult originAcc [] [] Nothing) flattenGrid
 
 
-getOriginsAccumulated : List Cell -> List Cell -> Maybe Cell -> CellOrigins -> Maybe ( CellOrigins, Cell )
+getOriginsAccumulated : List Cell -> List Cell -> Maybe Cell -> CellOrigins -> Result String ( CellOrigins, Cell )
 getOriginsAccumulated flattenGrid queue endCell originsAcc =
     case queue of
         [] ->
             case endCell of
                 Nothing ->
-                    Nothing
+                    Err "End Cell was not found."
 
                 Just cell ->
-                    Just ( originsAcc, cell )
+                    Ok ( originsAcc, cell )
 
         cell :: queueTail ->
             let
@@ -106,20 +122,23 @@ getOriginsAccumulated flattenGrid queue endCell originsAcc =
                         getOriginsAccumulated cellsRest (queueTail ++ neighbors) Nothing origins
 
                     Just cell ->
-                        Just ( origins, cell )
+                        Ok ( origins, cell )
 
 
 {-|
-TODO: Make this more intelligent to make it find the startPoint and endPoint from
-the beginning.
-
-If they don't exist, return Nothing.
-Else do what it's doing now, using a initialQueue of [initialCell]
-
-This can be a Maybe or a Either. Either could be better, because we can return
-a message saying what's the problem of this function (rather it's missing the
-initialCell or the endCell)
 -}
-getOrigins : List Cell -> List Cell -> Maybe ( CellOrigins, Cell )
-getOrigins flattenGrid queue =
-    getOriginsAccumulated flattenGrid queue Nothing Dict.empty
+getOrigins : Grid -> Result String ( CellOrigins, Cell )
+getOrigins grid =
+    let
+        flattenGrid =
+            flatGrid grid
+
+        initialCell =
+            findInList (\cell -> cell.category == StartPoint) flattenGrid
+    in
+        case initialCell of
+            Nothing ->
+                Err "Start Cell does not exist."
+
+            Just startCell ->
+                getOriginsAccumulated flattenGrid [ startCell ] Nothing Dict.empty

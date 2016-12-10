@@ -204,19 +204,15 @@ all =
             [ test "should return the origins of the whole grid" <|
                 \() ->
                     let
-                        initialQueue =
-                            [ Cell 0 0 StartPoint ]
-
-                        flattenGrid =
+                        grid =
                             createGrid
                                 [ "S.."
                                 , "..."
                                 , "..E"
                                 ]
-                                |> flatGrid
 
                         expected =
-                            Just
+                            Ok
                                 ( Dict.fromList
                                     [ ( ( 0, 0 ), Nothing )
                                     , ( ( 0, 1 ), Just ( 0, 0 ) )
@@ -231,23 +227,19 @@ all =
                                 , Cell 2 2 EndPoint
                                 )
                     in
-                        Expect.equal (getOrigins flattenGrid initialQueue) expected
+                        Expect.equal (getOrigins grid) expected
             , test "should stop once endCell is found" <|
                 \() ->
                     let
-                        initialQueue =
-                            [ Cell 0 0 StartPoint ]
-
-                        flattenGrid =
+                        grid =
                             createGrid
                                 [ "S.."
                                 , "E.."
                                 , "..."
                                 ]
-                                |> flatGrid
 
                         expected =
-                            Just
+                            Ok
                                 ( Dict.fromList
                                     [ ( ( 0, 0 ), Nothing )
                                     , ( ( 1, 0 ), Just ( 0, 0 ) )
@@ -255,24 +247,34 @@ all =
                                 , Cell 1 0 EndPoint
                                 )
                     in
-                        Expect.equal (getOrigins flattenGrid initialQueue) expected
-            , test "should return Nothing if the endPoint was not found" <|
+                        Expect.equal (getOrigins grid) expected
+            , test "should return an error if the startCell was not found" <|
                 \() ->
                     let
-                        initialQueue =
-                            [ Cell 0 0 StartPoint ]
+                        grid =
+                            createGrid
+                                [ "..."
+                                , "..."
+                                , "..."
+                                ]
 
-                        flattenGrid =
+                        expected =
+                            Err "Start Cell does not exist."
+                    in
+                        Expect.equal (getOrigins grid) expected
+            , test "should return an error if the endCell was not found" <|
+                \() ->
+                    let
+                        grid =
                             createGrid
                                 [ "S.."
                                 , "..."
                                 , "..."
                                 ]
-                                |> flatGrid
 
                         expected =
-                            Nothing
+                            Err "End Cell was not found."
                     in
-                        Expect.equal (getOrigins flattenGrid initialQueue) expected
+                        Expect.equal (getOrigins grid) expected
             ]
         ]
