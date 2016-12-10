@@ -64,23 +64,18 @@ all =
         [ describe "flatGrid"
             [ test "should convert a grid in a list of cells" <|
                 \() ->
-                    let
-                        grid =
-                            createGrid
-                                [ "S."
-                                , ".E"
-                                ]
-
-                        expected =
-                            [ Cell 0 0 StartPoint
-                            , Cell 0 1 Path
-                            , Cell 1 0 Path
-                            , Cell 1 1 EndPoint
+                    Expect.equal
+                        (createGrid
+                            [ "S."
+                            , ".E"
                             ]
-                    in
-                        Expect.equal
-                            (flatGrid grid)
-                            expected
+                            |> flatGrid
+                        )
+                        [ Cell 0 0 StartPoint
+                        , Cell 0 1 Path
+                        , Cell 1 0 Path
+                        , Cell 1 1 EndPoint
+                        ]
             ]
         , describe "areNeighbors"
             [ test "should return true if the cells are neighbors" <|
@@ -107,12 +102,13 @@ all =
                         originCell =
                             Cell 1 1 StartPoint
 
-                        grid =
+                        flattenGrid =
                             createGrid
                                 [ "..."
                                 , ".S."
                                 , "..."
                                 ]
+                                |> flatGrid
 
                         expected =
                             { origins =
@@ -138,21 +134,20 @@ all =
                             , endCell = Nothing
                             }
                     in
-                        Expect.equal
-                            (getNeighbors Dict.empty originCell (flatGrid grid))
-                            expected
+                        Expect.equal (getNeighbors Dict.empty originCell flattenGrid) expected
             , test "should return empty values if there's no neighbors" <|
                 \() ->
                     let
                         originCell =
                             Cell 0 0 Path
 
-                        grid =
+                        flattenGrid =
                             createGrid
                                 [ ".X."
                                 , "XX."
                                 , "..."
                                 ]
+                                |> flatGrid
 
                         expected =
                             { origins = Dict.empty
@@ -170,20 +165,19 @@ all =
                             , endCell = Nothing
                             }
                     in
-                        Expect.equal
-                            (getNeighbors Dict.empty originCell (flatGrid grid))
-                            expected
+                        Expect.equal (getNeighbors Dict.empty originCell flattenGrid) expected
             , test "should set the endCell if it was found" <|
                 \() ->
                     let
                         originCell =
                             Cell 0 0 StartPoint
 
-                        grid =
+                        flattenGrid =
                             createGrid
                                 [ "SE."
                                 , "..."
                                 ]
+                                |> flatGrid
 
                         expected =
                             { origins =
@@ -204,9 +198,7 @@ all =
                             , endCell = Just (Cell 0 1 EndPoint)
                             }
                     in
-                        Expect.equal
-                            (getNeighbors Dict.empty originCell (flatGrid grid))
-                            expected
+                        Expect.equal (getNeighbors Dict.empty originCell flattenGrid) expected
             ]
         , describe "getOrigins"
             [ test "should return the origins of the whole grid" <|
@@ -236,8 +228,6 @@ all =
                                 , ( ( 2, 2 ), Just ( 1, 2 ) )
                                 ]
                     in
-                        Expect.equal
-                            (getOrigins flattenGrid initialQueue)
-                            expected
+                        Expect.equal (getOrigins flattenGrid initialQueue) expected
             ]
         ]
