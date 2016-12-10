@@ -11,7 +11,7 @@ import Lib.GridTypes exposing (..)
 main : Program Never Model Msg
 main =
     Html.beginnerProgram
-        { model = model
+        { model = initialModel
         , view = view
         , update = update
         }
@@ -24,8 +24,8 @@ type alias Model =
     }
 
 
-model : Model
-model =
+initialModel : Model
+initialModel =
     { rows = 0
     , cols = 0
     , grid = []
@@ -37,6 +37,7 @@ type Msg
     | UpdateCols String
     | UpdateCell Cell
     | SetEndCell Cell
+    | RestartAll
 
 
 update : Msg -> Model -> Model
@@ -71,6 +72,9 @@ update msg model =
             { model
                 | grid = setEndCellInGrid cell model.grid
             }
+
+        RestartAll ->
+            initialModel
 
 
 getTable : Grid -> Html Msg
@@ -113,7 +117,8 @@ view model =
               """
             ]
         , p []
-            [ button [] [ text "Calculate shortest path" ]
+            [ button [] [ text "Show solution" ]
+            , button [ onClick RestartAll ] [ text "Restart" ]
             ]
         , p []
             [ label []
