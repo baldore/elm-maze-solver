@@ -211,22 +211,25 @@ all =
                             createGrid
                                 [ "S.."
                                 , "..."
-                                , "..."
+                                , "..E"
                                 ]
                                 |> flatGrid
 
                         expected =
-                            Dict.fromList
-                                [ ( ( 0, 0 ), Nothing )
-                                , ( ( 0, 1 ), Just ( 0, 0 ) )
-                                , ( ( 1, 0 ), Just ( 0, 0 ) )
-                                , ( ( 0, 2 ), Just ( 0, 1 ) )
-                                , ( ( 1, 1 ), Just ( 0, 1 ) )
-                                , ( ( 2, 0 ), Just ( 1, 0 ) )
-                                , ( ( 1, 2 ), Just ( 0, 2 ) )
-                                , ( ( 2, 1 ), Just ( 1, 1 ) )
-                                , ( ( 2, 2 ), Just ( 1, 2 ) )
-                                ]
+                            Just
+                                ( Dict.fromList
+                                    [ ( ( 0, 0 ), Nothing )
+                                    , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                    , ( ( 1, 0 ), Just ( 0, 0 ) )
+                                    , ( ( 0, 2 ), Just ( 0, 1 ) )
+                                    , ( ( 1, 1 ), Just ( 0, 1 ) )
+                                    , ( ( 2, 0 ), Just ( 1, 0 ) )
+                                    , ( ( 1, 2 ), Just ( 0, 2 ) )
+                                    , ( ( 2, 1 ), Just ( 1, 1 ) )
+                                    , ( ( 2, 2 ), Just ( 1, 2 ) )
+                                    ]
+                                , Cell 2 2 EndPoint
+                                )
                     in
                         Expect.equal (getOrigins flattenGrid initialQueue) expected
             , test "should stop once endCell is found" <|
@@ -244,10 +247,31 @@ all =
                                 |> flatGrid
 
                         expected =
-                            Dict.fromList
-                                [ ( ( 0, 0 ), Nothing )
-                                , ( ( 1, 0 ), Just ( 0, 0 ) )
+                            Just
+                                ( Dict.fromList
+                                    [ ( ( 0, 0 ), Nothing )
+                                    , ( ( 1, 0 ), Just ( 0, 0 ) )
+                                    ]
+                                , Cell 1 0 EndPoint
+                                )
+                    in
+                        Expect.equal (getOrigins flattenGrid initialQueue) expected
+            , test "should return Nothing if the endPoint was not found" <|
+                \() ->
+                    let
+                        initialQueue =
+                            [ Cell 0 0 StartPoint ]
+
+                        flattenGrid =
+                            createGrid
+                                [ "S.."
+                                , "..."
+                                , "..."
                                 ]
+                                |> flatGrid
+
+                        expected =
+                            Nothing
                     in
                         Expect.equal (getOrigins flattenGrid initialQueue) expected
             ]

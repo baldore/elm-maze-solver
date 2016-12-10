@@ -85,23 +85,30 @@ getNeighbors originAcc originCell flattenGrid =
             List.foldr extractNeighbors (GetNeighborsResult originAcc [] [] Nothing) flattenGrid
 
 
-getOriginsAccumulated : List Cell -> List Cell -> CellOrigins -> CellOrigins
-getOriginsAccumulated flattenGrid queue originsAcc =
+getOriginsAccumulated : List Cell -> List Cell -> Maybe Cell -> CellOrigins -> Maybe ( CellOrigins, Cell )
+getOriginsAccumulated flattenGrid queue endCell originsAcc =
     case queue of
         [] ->
-            originsAcc
+            case endCell of
+                Nothing ->
+                    Nothing
+
+                Just cell ->
+                    Just ( originsAcc, cell )
 
         cell :: queueTail ->
             let
                 { origins, neighbors, cellsRest, endCell } =
                     getNeighbors originsAcc cell flattenGrid
             in
-                if (endCell == Nothing) then
-                    getOriginsAccumulated cellsRest (queueTail ++ neighbors) origins
-                else
-                    origins
+                case endCell of
+                    Nothing ->
+                        getOriginsAccumulated cellsRest (queueTail ++ neighbors) Nothing origins
+
+                    Just cell ->
+                        Just ( origins, cell )
 
 
-getOrigins : List Cell -> List Cell -> CellOrigins
+getOrigins : List Cell -> List Cell -> Maybe ( CellOrigins, Cell )
 getOrigins flattenGrid queue =
-    getOriginsAccumulated flattenGrid queue Dict.empty
+    getOriginsAccumulated flattenGrid queue Nothing Dict.empty
