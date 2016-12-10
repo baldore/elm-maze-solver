@@ -4,6 +4,17 @@ import Lib.GridTypes exposing (..)
 import Dict
 
 
+type alias GetNeighborsResult =
+    { origins : CellOrigins
+    , neighbors : List Cell
+    , cellsRest : List Cell
+    }
+
+
+type alias CellOrigins =
+    Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
+
+
 solveMaze : Grid -> List Cell
 solveMaze grid =
     []
@@ -31,25 +42,24 @@ tupleFromCell cell =
     ( cell.row, cell.col )
 
 
-getNeighbors :
-    Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
-    -> Cell
-    -> List Cell
-    -> ( Dict.Dict ( Int, Int ) (Maybe ( Int, Int )), List Cell, List Cell )
+getNeighbors : CellOrigins -> Cell -> List Cell -> GetNeighborsResult
 getNeighbors originAcc originCell flattenGrid =
     let
         extractNeighbors =
-            \cell ( acc, neighbors, gridRest ) ->
+            \cell acc ->
                 -- If it's the same, we just ignore it
                 if (originCell.row == cell.row && originCell.col == cell.col) then
-                    ( acc, neighbors, gridRest )
+                    acc
                 else if (areNeighbors originCell cell) then
-                    ( Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell)) acc
-                    , cell :: neighbors
-                    , gridRest
-                    )
+                    { origins = Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell)) acc.origins
+                    , neighbors = cell :: acc.neighbors
+                    , cellsRest = acc.cellsRest
+                    }
                 else
-                    ( acc, neighbors, cell :: gridRest )
+                    { origins = acc.origins
+                    , neighbors = acc.neighbors
+                    , cellsRest = cell :: acc.cellsRest
+                    }
     in
         -- If our cell is the starting point and doesn't exist in the origins, we
         -- need to add it, since that cell defines that the solution was found when
@@ -57,14 +67,10 @@ getNeighbors originAcc originCell flattenGrid =
         if (originCell.category == StartPoint && not (Dict.member ( originCell.row, originCell.col ) originAcc)) then
             getNeighbors (Dict.insert (tupleFromCell originCell) Nothing originAcc) originCell flattenGrid
         else
-            List.foldr extractNeighbors ( originAcc, [], [] ) flattenGrid
+            List.foldr extractNeighbors (GetNeighborsResult originAcc [] []) flattenGrid
 
 
-getOriginsAccumulated :
-    List Cell
-    -> List Cell
-    -> Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
-    -> Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
+getOriginsAccumulated : List Cell -> List Cell -> CellOrigins -> CellOrigins
 getOriginsAccumulated flattenGrid queue originsAcc =
     case queue of
         [] ->
@@ -72,12 +78,12 @@ getOriginsAccumulated flattenGrid queue originsAcc =
 
         cell :: queueTail ->
             let
-                ( newOriginsAcc, foundNeighbors, restFlattenGrid ) =
+                { origins, neighbors, cellsRest } =
                     getNeighbors originsAcc cell flattenGrid
             in
-                getOriginsAccumulated restFlattenGrid (queueTail ++ foundNeighbors) newOriginsAcc
+                getOriginsAccumulated cellsRest (queueTail ++ neighbors) origins
 
 
-getOrigins : List Cell -> List Cell -> Dict.Dict ( Int, Int ) (Maybe ( Int, Int ))
+getOrigins : List Cell -> List Cell -> CellOrigins
 getOrigins flattenGrid queue =
     getOriginsAccumulated flattenGrid queue Dict.empty

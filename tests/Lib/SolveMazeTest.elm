@@ -115,24 +115,27 @@ all =
                                 ]
 
                         expected =
-                            ( Dict.fromList
-                                [ ( ( 1, 1 ), Nothing )
-                                , ( ( 0, 1 ), Just ( 1, 1 ) )
-                                , ( ( 1, 0 ), Just ( 1, 1 ) )
-                                , ( ( 1, 2 ), Just ( 1, 1 ) )
-                                , ( ( 2, 1 ), Just ( 1, 1 ) )
+                            { origins =
+                                Dict.fromList
+                                    [ ( ( 1, 1 ), Nothing )
+                                    , ( ( 0, 1 ), Just ( 1, 1 ) )
+                                    , ( ( 1, 0 ), Just ( 1, 1 ) )
+                                    , ( ( 1, 2 ), Just ( 1, 1 ) )
+                                    , ( ( 2, 1 ), Just ( 1, 1 ) )
+                                    ]
+                            , neighbors =
+                                [ Cell 0 1 Path
+                                , Cell 1 0 Path
+                                , Cell 1 2 Path
+                                , Cell 2 1 Path
                                 ]
-                            , [ Cell 0 1 Path
-                              , Cell 1 0 Path
-                              , Cell 1 2 Path
-                              , Cell 2 1 Path
-                              ]
-                            , [ Cell 0 0 Path
-                              , Cell 0 2 Path
-                              , Cell 2 0 Path
-                              , Cell 2 2 Path
-                              ]
-                            )
+                            , cellsRest =
+                                [ Cell 0 0 Path
+                                , Cell 0 2 Path
+                                , Cell 2 0 Path
+                                , Cell 2 2 Path
+                                ]
+                            }
                     in
                         Expect.equal
                             (getNeighbors Dict.empty originCell (flatGrid grid))
@@ -151,18 +154,19 @@ all =
                                 ]
 
                         expected =
-                            ( Dict.empty
-                            , []
-                            , [ Cell 0 1 Wall
-                              , Cell 0 2 Path
-                              , Cell 1 0 Wall
-                              , Cell 1 1 Wall
-                              , Cell 1 2 Path
-                              , Cell 2 0 Path
-                              , Cell 2 1 Path
-                              , Cell 2 2 Path
-                              ]
-                            )
+                            { origins = Dict.empty
+                            , neighbors = []
+                            , cellsRest =
+                                [ Cell 0 1 Wall
+                                , Cell 0 2 Path
+                                , Cell 1 0 Wall
+                                , Cell 1 1 Wall
+                                , Cell 1 2 Path
+                                , Cell 2 0 Path
+                                , Cell 2 1 Path
+                                , Cell 2 2 Path
+                                ]
+                            }
                     in
                         Expect.equal
                             (getNeighbors Dict.empty originCell (flatGrid grid))
