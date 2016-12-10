@@ -109,6 +109,17 @@ getOriginsAccumulated flattenGrid queue endCell originsAcc =
                         Just ( origins, cell )
 
 
+{-|
+TODO: Make this more intelligent to make it find the startPoint and endPoint from
+the beginning.
+
+If they don't exist, return Nothing.
+Else do what it's doing now, using a initialQueue of [initialCell]
+
+This can be a Maybe or a Either. Either could be better, because we can return
+a message saying what's the problem of this function (rather it's missing the
+initialCell or the endCell)
+-}
 getOrigins : List Cell -> List Cell -> Maybe ( CellOrigins, Cell )
 getOrigins flattenGrid queue =
     getOriginsAccumulated flattenGrid queue Nothing Dict.empty
