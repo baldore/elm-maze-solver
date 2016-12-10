@@ -4,10 +4,17 @@ import Lib.GridTypes exposing (..)
 import Dict
 
 
+{-|
+This alias defines the result of getNeighbors.
+
+@property endCell: When the end cell is found, the maze has a solution and it
+can be used to find the path until the first cell.
+-}
 type alias GetNeighborsResult =
     { origins : CellOrigins
     , neighbors : List Cell
     , cellsRest : List Cell
+    , endCell : Maybe Cell
     }
 
 
@@ -54,11 +61,17 @@ getNeighbors originAcc originCell flattenGrid =
                     { origins = Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell)) acc.origins
                     , neighbors = cell :: acc.neighbors
                     , cellsRest = acc.cellsRest
+                    , endCell =
+                        if (cell.category == EndPoint) then
+                            Just cell
+                        else
+                            Nothing
                     }
                 else
                     { origins = acc.origins
                     , neighbors = acc.neighbors
                     , cellsRest = cell :: acc.cellsRest
+                    , endCell = Nothing
                     }
     in
         -- If our cell is the starting point and doesn't exist in the origins, we
@@ -67,7 +80,7 @@ getNeighbors originAcc originCell flattenGrid =
         if (originCell.category == StartPoint && not (Dict.member ( originCell.row, originCell.col ) originAcc)) then
             getNeighbors (Dict.insert (tupleFromCell originCell) Nothing originAcc) originCell flattenGrid
         else
-            List.foldr extractNeighbors (GetNeighborsResult originAcc [] []) flattenGrid
+            List.foldr extractNeighbors (GetNeighborsResult originAcc [] [] Nothing) flattenGrid
 
 
 getOriginsAccumulated : List Cell -> List Cell -> CellOrigins -> CellOrigins

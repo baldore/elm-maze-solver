@@ -135,6 +135,7 @@ all =
                                 , Cell 2 0 Path
                                 , Cell 2 2 Path
                                 ]
+                            , endCell = Nothing
                             }
                     in
                         Expect.equal
@@ -166,6 +167,41 @@ all =
                                 , Cell 2 1 Path
                                 , Cell 2 2 Path
                                 ]
+                            , endCell = Nothing
+                            }
+                    in
+                        Expect.equal
+                            (getNeighbors Dict.empty originCell (flatGrid grid))
+                            expected
+            , test "should set the endCell if it was found" <|
+                \() ->
+                    let
+                        originCell =
+                            Cell 0 0 StartPoint
+
+                        grid =
+                            createGrid
+                                [ "SE."
+                                , "..."
+                                ]
+
+                        expected =
+                            { origins =
+                                Dict.fromList
+                                    [ ( ( 0, 0 ), Nothing )
+                                    , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                    , ( ( 1, 0 ), Just ( 0, 0 ) )
+                                    ]
+                            , neighbors =
+                                [ Cell 0 1 EndPoint
+                                , Cell 1 0 Path
+                                ]
+                            , cellsRest =
+                                [ Cell 0 2 Path
+                                , Cell 1 1 Path
+                                , Cell 1 2 Path
+                                ]
+                            , endCell = Just (Cell 0 1 EndPoint)
                             }
                     in
                         Expect.equal
