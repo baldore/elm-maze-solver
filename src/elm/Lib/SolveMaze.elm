@@ -1,6 +1,7 @@
 module Lib.SolveMaze exposing (..)
 
 import Lib.GridTypes exposing (..)
+import Lib.GridHelpers exposing (updateCell)
 import Dict
 
 
@@ -77,7 +78,7 @@ getNeighbors originAcc originCell flattenGrid =
                     , neighbors = cell :: acc.neighbors
                     , cellsRest = acc.cellsRest
                     , endCell =
-                        if (cell.category == EndPoint) then
+                        if (cell.category == EndCell) then
                             Just cell
                         else
                             Nothing
@@ -92,7 +93,7 @@ getNeighbors originAcc originCell flattenGrid =
         -- If our cell is the starting point and doesn't exist in the origins, we
         -- need to add it, since that cell defines that the solution was found when
         -- the origins dictionary is being processed.
-        if (originCell.category == StartPoint && not (Dict.member (tupleFromCell originCell) originAcc)) then
+        if (originCell.category == StartCell && not (Dict.member (tupleFromCell originCell) originAcc)) then
             getNeighbors
                 (originAcc |> Dict.insert (tupleFromCell originCell) Nothing)
                 originCell
@@ -112,7 +113,7 @@ getOrigins grid =
 
         initialCell =
             findInList
-                (\cell -> cell.category == StartPoint)
+                (\cell -> cell.category == StartCell)
                 flattenGrid
     in
         case initialCell of
@@ -190,6 +191,27 @@ getShortestPath endCell origins =
                     (endCellTuple :: [])
 
 
-solveMaze : Grid -> List Cell
-solveMaze grid =
-    []
+replacePathInGrid : List ( Int, Int ) -> Grid -> Grid
+replacePathInGrid path grid =
+    case path of
+        [] ->
+            grid
+
+        ( row, col ) :: restPath ->
+            replacePathInGrid
+                restPath
+                (updateCell grid (Cell row col AnswerCell))
+
+
+
+-- {-|
+-- If everything is ok, it will return a new grid with the new solution. Otherwise,
+-- will return an error.
+-- -}
+-- solveMaze : Grid -> Result String Grid
+-- solveMaze grid =
+--     let
+--
+--     in
+--       getOrigins grid
+--         |> Result.andThen

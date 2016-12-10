@@ -12,8 +12,9 @@ type alias Cols =
 type CellType
     = Wall
     | Path
-    | StartPoint
-    | EndPoint
+    | StartCell
+    | EndCell
+    | AnswerCell
 
 
 type alias Cell =

@@ -71,7 +71,7 @@ updateRow cols rowIndex row =
                     , category =
                         -- Here is where we define the start point
                         if row == 0 && col == 0 then
-                            StartPoint
+                            StartCell
                         else
                             Path
                     }
@@ -112,10 +112,10 @@ setEndCellInGrid endCell grid =
 
         setNewEndCell =
             \cell ->
-                if cell.category == EndPoint then
+                if cell.category == EndCell then
                     { cell | category = Path }
                 else if cell == endCell then
-                    { cell | category = EndPoint }
+                    { cell | category = EndCell }
                 else
                     cell
     in

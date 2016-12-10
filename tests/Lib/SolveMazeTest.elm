@@ -16,16 +16,19 @@ createCell row col char =
         category =
             case char of
                 'S' ->
-                    StartPoint
+                    StartCell
 
                 'E' ->
-                    EndPoint
+                    EndCell
 
                 'X' ->
                     Wall
 
                 '.' ->
                     Path
+
+                'a' ->
+                    AnswerCell
 
                 _ ->
                     Path
@@ -71,10 +74,10 @@ all =
                             ]
                             |> flatGrid
                         )
-                        [ Cell 0 0 StartPoint
+                        [ Cell 0 0 StartCell
                         , Cell 0 1 Path
                         , Cell 1 0 Path
-                        , Cell 1 1 EndPoint
+                        , Cell 1 1 EndCell
                         ]
             ]
         , describe "areNeighbors"
@@ -100,7 +103,7 @@ all =
                 \() ->
                     let
                         originCell =
-                            Cell 1 1 StartPoint
+                            Cell 1 1 StartCell
 
                         flattenGrid =
                             createGrid
@@ -170,7 +173,7 @@ all =
                 \() ->
                     let
                         originCell =
-                            Cell 0 0 StartPoint
+                            Cell 0 0 StartCell
 
                         flattenGrid =
                             createGrid
@@ -187,7 +190,7 @@ all =
                                     , ( ( 1, 0 ), Just ( 0, 0 ) )
                                     ]
                             , neighbors =
-                                [ Cell 0 1 EndPoint
+                                [ Cell 0 1 EndCell
                                 , Cell 1 0 Path
                                 ]
                             , cellsRest =
@@ -195,7 +198,7 @@ all =
                                 , Cell 1 1 Path
                                 , Cell 1 2 Path
                                 ]
-                            , endCell = Just (Cell 0 1 EndPoint)
+                            , endCell = Just (Cell 0 1 EndCell)
                             }
                     in
                         Expect.equal (getNeighbors Dict.empty originCell flattenGrid) expected
@@ -224,7 +227,7 @@ all =
                                     , ( ( 2, 1 ), Just ( 1, 1 ) )
                                     , ( ( 2, 2 ), Just ( 1, 2 ) )
                                     ]
-                                , Cell 2 2 EndPoint
+                                , Cell 2 2 EndCell
                                 )
                     in
                         Expect.equal (getOrigins grid) expected
@@ -244,7 +247,7 @@ all =
                                     [ ( ( 0, 0 ), Nothing )
                                     , ( ( 1, 0 ), Just ( 0, 0 ) )
                                     ]
-                                , Cell 1 0 EndPoint
+                                , Cell 1 0 EndCell
                                 )
                     in
                         Expect.equal (getOrigins grid) expected
@@ -282,7 +285,7 @@ all =
                 \() ->
                     let
                         endCell =
-                            Cell 0 4 EndPoint
+                            Cell 0 4 EndCell
 
                         origins =
                             Dict.fromList
@@ -298,7 +301,7 @@ all =
                 \() ->
                     let
                         endCell =
-                            Cell 0 3 EndPoint
+                            Cell 0 3 EndCell
 
                         origins =
                             Dict.fromList
@@ -316,7 +319,7 @@ all =
                 \() ->
                     let
                         endCell =
-                            Cell 0 3 EndPoint
+                            Cell 0 3 EndCell
 
                         origins =
                             Dict.fromList
@@ -332,4 +335,50 @@ all =
                     in
                         Expect.equal (getShortestPath endCell origins) expected
             ]
+        , describe "replacePathInGrid"
+            [ test "should replace all the elements in path on the grid" <|
+                \() ->
+                    let
+                        grid =
+                            createGrid
+                                [ "SX."
+                                , ".X."
+                                , "EX."
+                                ]
+
+                        path =
+                            [ ( 0, 0 )
+                            , ( 1, 0 )
+                            , ( 2, 0 )
+                            ]
+
+                        expected =
+                            createGrid
+                                [ "aX."
+                                , "aX."
+                                , "aX."
+                                ]
+                    in
+                        Expect.equal (replacePathInGrid path grid) expected
+            ]
+          -- , describe "solveMaze"
+          --     [ test "should return a new grid with the resolved path" <|
+          --         \() ->
+          --             let
+          --                 grid =
+          --                     createGrid
+          --                         [ "SX."
+          --                         , ".X."
+          --                         , "EX."
+          --                         ]
+          --
+          --                 expected =
+          --                     createGrid
+          --                         [ "aX."
+          --                         , "aX."
+          --                         , "aX."
+          --                         ]
+          --                         |> Ok
+          --             in
+          --                 Expect.equal (solveMaze grid) expected
         ]
