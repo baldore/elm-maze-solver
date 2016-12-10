@@ -277,4 +277,59 @@ all =
                     in
                         Expect.equal (getOrigins grid) expected
             ]
+        , describe "getShortestPath"
+            [ test "should return an error if the end cell is not present in the origins" <|
+                \() ->
+                    let
+                        endCell =
+                            Cell 0 4 EndPoint
+
+                        origins =
+                            Dict.fromList
+                                [ ( ( 0, 0 ), Nothing )
+                                , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                ]
+
+                        expected =
+                            Err "End Cell was not found in the origins."
+                    in
+                        Expect.equal (getShortestPath endCell origins) expected
+            , test "should return the correct path if the values are good" <|
+                \() ->
+                    let
+                        endCell =
+                            Cell 0 3 EndPoint
+
+                        origins =
+                            Dict.fromList
+                                [ ( ( 0, 0 ), Nothing )
+                                , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                , ( ( 0, 2 ), Just ( 0, 1 ) )
+                                , ( ( 0, 3 ), Just ( 0, 2 ) )
+                                ]
+
+                        expected =
+                            Ok [ ( 0, 0 ), ( 0, 1 ), ( 0, 2 ), ( 0, 3 ) ]
+                    in
+                        Expect.equal (getShortestPath endCell origins) expected
+            , test "should return an error if during the origin cell look up, the next origin doesnt exist" <|
+                \() ->
+                    let
+                        endCell =
+                            Cell 0 3 EndPoint
+
+                        origins =
+                            Dict.fromList
+                                [ ( ( 0, 0 ), Nothing )
+                                , ( ( 0, 1 ), Just ( 0, 0 ) )
+                                  -- (0, 7) doesn't exist and breaks the test
+                                , ( ( 0, 2 ), Just ( 0, 7 ) )
+                                , ( ( 0, 3 ), Just ( 0, 2 ) )
+                                ]
+
+                        expected =
+                            Err "Origins data is corrupted. It should reach some cell, but it doesn't exist."
+                    in
+                        Expect.equal (getShortestPath endCell origins) expected
+            ]
         ]

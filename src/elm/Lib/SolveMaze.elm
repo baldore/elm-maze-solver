@@ -38,14 +38,14 @@ findInList condition list =
                 findInList condition tail
 
 
-solveMaze : Grid -> List Cell
-solveMaze grid =
-    []
-
-
 flatGrid : Grid -> List Cell
 flatGrid =
     List.concat
+
+
+tupleFromCell : Cell -> ( Int, Int )
+tupleFromCell cell =
+    ( cell.row, cell.col )
 
 
 areNeighbors : Cell -> Cell -> Bool
@@ -60,11 +60,6 @@ areNeighbors c1 c2 =
         False
 
 
-tupleFromCell : Cell -> ( Int, Int )
-tupleFromCell cell =
-    ( cell.row, cell.col )
-
-
 getNeighbors : CellOrigins -> Cell -> List Cell -> GetNeighborsResult
 getNeighbors originAcc originCell flattenGrid =
     let
@@ -76,7 +71,9 @@ getNeighbors originAcc originCell flattenGrid =
                 else if (originCell.row == cell.row && originCell.col == cell.col) then
                     acc
                 else if (areNeighbors originCell cell) then
-                    { origins = Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell)) acc.origins
+                    { origins =
+                        acc.origins
+                            |> Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell))
                     , neighbors = cell :: acc.neighbors
                     , cellsRest = acc.cellsRest
                     , endCell =
@@ -95,10 +92,39 @@ getNeighbors originAcc originCell flattenGrid =
         -- If our cell is the starting point and doesn't exist in the origins, we
         -- need to add it, since that cell defines that the solution was found when
         -- the origins dictionary is being processed.
-        if (originCell.category == StartPoint && not (Dict.member ( originCell.row, originCell.col ) originAcc)) then
-            getNeighbors (Dict.insert (tupleFromCell originCell) Nothing originAcc) originCell flattenGrid
+        if (originCell.category == StartPoint && not (Dict.member (tupleFromCell originCell) originAcc)) then
+            getNeighbors
+                (originAcc |> Dict.insert (tupleFromCell originCell) Nothing)
+                originCell
+                flattenGrid
         else
-            List.foldr extractNeighbors (GetNeighborsResult originAcc [] [] Nothing) flattenGrid
+            List.foldr
+                extractNeighbors
+                (GetNeighborsResult originAcc [] [] Nothing)
+                flattenGrid
+
+
+getOrigins : Grid -> Result String ( CellOrigins, Cell )
+getOrigins grid =
+    let
+        flattenGrid =
+            flatGrid grid
+
+        initialCell =
+            findInList
+                (\cell -> cell.category == StartPoint)
+                flattenGrid
+    in
+        case initialCell of
+            Nothing ->
+                Err "Start Cell does not exist."
+
+            Just startCell ->
+                getOriginsAccumulated
+                    flattenGrid
+                    [ startCell ]
+                    Nothing
+                    Dict.empty
 
 
 getOriginsAccumulated : List Cell -> List Cell -> Maybe Cell -> CellOrigins -> Result String ( CellOrigins, Cell )
@@ -119,26 +145,51 @@ getOriginsAccumulated flattenGrid queue endCell originsAcc =
             in
                 case endCell of
                     Nothing ->
-                        getOriginsAccumulated cellsRest (queueTail ++ neighbors) Nothing origins
+                        getOriginsAccumulated
+                            cellsRest
+                            (queueTail ++ neighbors)
+                            Nothing
+                            origins
 
                     Just cell ->
                         Ok ( origins, cell )
 
 
-{-|
--}
-getOrigins : Grid -> Result String ( CellOrigins, Cell )
-getOrigins grid =
+getShortestPath : Cell -> CellOrigins -> Result String (List ( Int, Int ))
+getShortestPath endCell origins =
     let
-        flattenGrid =
-            flatGrid grid
+        endCellTuple =
+            tupleFromCell endCell
 
-        initialCell =
-            findInList (\cell -> cell.category == StartPoint) flattenGrid
+        getShortestPath_ =
+            \cellOrigin origins acc ->
+                case cellOrigin of
+                    -- The cell without origin is the initial cell
+                    Nothing ->
+                        Ok acc
+
+                    Just cellTuple ->
+                        case Dict.get cellTuple origins of
+                            Nothing ->
+                                Err "Origins data is corrupted. It should reach some cell, but it doesn't exist."
+
+                            Just nextCellOrigin ->
+                                getShortestPath_
+                                    nextCellOrigin
+                                    origins
+                                    (cellTuple :: acc)
     in
-        case initialCell of
+        case Dict.get endCellTuple origins of
             Nothing ->
-                Err "Start Cell does not exist."
+                Err "End Cell was not found in the origins."
 
-            Just startCell ->
-                getOriginsAccumulated flattenGrid [ startCell ] Nothing Dict.empty
+            Just cellOrigin ->
+                getShortestPath_
+                    cellOrigin
+                    origins
+                    (endCellTuple :: [])
+
+
+solveMaze : Grid -> List Cell
+solveMaze grid =
+    []
