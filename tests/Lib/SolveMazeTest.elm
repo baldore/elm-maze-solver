@@ -229,5 +229,26 @@ all =
                                 ]
                     in
                         Expect.equal (getOrigins flattenGrid initialQueue) expected
+            , test "should stop once endCell is found" <|
+                \() ->
+                    let
+                        initialQueue =
+                            [ Cell 0 0 StartPoint ]
+
+                        flattenGrid =
+                            createGrid
+                                [ "S.."
+                                , "E.."
+                                , "..."
+                                ]
+                                |> flatGrid
+
+                        expected =
+                            Dict.fromList
+                                [ ( ( 0, 0 ), Nothing )
+                                , ( ( 1, 0 ), Just ( 0, 0 ) )
+                                ]
+                    in
+                        Expect.equal (getOrigins flattenGrid initialQueue) expected
             ]
         ]

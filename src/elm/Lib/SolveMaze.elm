@@ -54,8 +54,10 @@ getNeighbors originAcc originCell flattenGrid =
     let
         extractNeighbors =
             \cell acc ->
-                -- If it's the same, we just ignore it
-                if (originCell.row == cell.row && originCell.col == cell.col) then
+                -- Once it finds the endCell, it stops processing the rest of the cells
+                if (acc.endCell /= Nothing) then
+                    acc
+                else if (originCell.row == cell.row && originCell.col == cell.col) then
                     acc
                 else if (areNeighbors originCell cell) then
                     { origins = Dict.insert (tupleFromCell cell) (Just (tupleFromCell originCell)) acc.origins
@@ -91,10 +93,13 @@ getOriginsAccumulated flattenGrid queue originsAcc =
 
         cell :: queueTail ->
             let
-                { origins, neighbors, cellsRest } =
+                { origins, neighbors, cellsRest, endCell } =
                     getNeighbors originsAcc cell flattenGrid
             in
-                getOriginsAccumulated cellsRest (queueTail ++ neighbors) origins
+                if (endCell == Nothing) then
+                    getOriginsAccumulated cellsRest (queueTail ++ neighbors) origins
+                else
+                    origins
 
 
 getOrigins : List Cell -> List Cell -> CellOrigins
