@@ -361,24 +361,25 @@ all =
                     in
                         Expect.equal (replacePathInGrid path grid) expected
             ]
-          -- , describe "solveMaze"
-          --     [ test "should return a new grid with the resolved path" <|
-          --         \() ->
-          --             let
-          --                 grid =
-          --                     createGrid
-          --                         [ "SX."
-          --                         , ".X."
-          --                         , "EX."
-          --                         ]
-          --
-          --                 expected =
-          --                     createGrid
-          --                         [ "aX."
-          --                         , "aX."
-          --                         , "aX."
-          --                         ]
-          --                         |> Ok
-          --             in
-          --                 Expect.equal (solveMaze grid) expected
+        , describe "solveMaze"
+            [ test "should return a new grid with the resolved path" <|
+                \() ->
+                    let
+                        grid =
+                            createGrid
+                                [ "SX."
+                                , ".X."
+                                , "EX."
+                                ]
+
+                        expected =
+                            createGrid
+                                [ "aX."
+                                , "aX."
+                                , "aX."
+                                ]
+                                |> Ok
+                    in
+                        Expect.equal (solveMaze grid) expected
+            ]
         ]

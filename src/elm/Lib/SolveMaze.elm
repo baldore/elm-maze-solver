@@ -203,15 +203,12 @@ replacePathInGrid path grid =
                 (updateCell grid (Cell row col AnswerCell))
 
 
-
--- {-|
--- If everything is ok, it will return a new grid with the new solution. Otherwise,
--- will return an error.
--- -}
--- solveMaze : Grid -> Result String Grid
--- solveMaze grid =
---     let
---
---     in
---       getOrigins grid
---         |> Result.andThen
+{-|
+If everything is ok, it will return a new grid with the new solution. Otherwise,
+will return an error.
+-}
+solveMaze : Grid -> Result String Grid
+solveMaze grid =
+    getOrigins grid
+        |> Result.andThen (\( cellOrigins, endCell ) -> getShortestPath endCell cellOrigins)
+        |> Result.map (\path -> replacePathInGrid path grid)
