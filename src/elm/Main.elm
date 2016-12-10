@@ -6,6 +6,7 @@ import Html.Events exposing (onInput, onClick)
 import Lib.CustomEvents exposing (onRightClick)
 import Lib.GridHelpers exposing (..)
 import Lib.GridTypes exposing (..)
+import Lib.SolveMaze exposing (solveMaze)
 
 
 main : Program Never Model Msg
@@ -37,6 +38,7 @@ type Msg
     | UpdateCols String
     | UpdateCell Cell
     | SetEndCell Cell
+    | SolveMaze
     | RestartAll
 
 
@@ -71,6 +73,17 @@ update msg model =
         SetEndCell cell ->
             { model
                 | grid = setEndCellInGrid cell model.grid
+            }
+
+        SolveMaze ->
+            { model
+                | grid =
+                    case solveMaze model.grid of
+                        Err _ ->
+                            model.grid
+
+                        Ok solvedGrid ->
+                            solvedGrid
             }
 
         RestartAll ->
@@ -117,7 +130,7 @@ view model =
               """
             ]
         , p []
-            [ button [] [ text "Show solution" ]
+            [ button [ onClick SolveMaze ] [ text "Show solution" ]
             , button [ onClick RestartAll ] [ text "Restart" ]
             ]
         , p []
