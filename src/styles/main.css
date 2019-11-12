@@ -1,0 +1,49 @@
+.main-container {
+  padding: 0 15px;
+}
+
+.field-label {
+  display: inline-block;
+  min-width: 100px;
+}
+
+.grid-table {
+  --grid-border-color: #ccc;
+  border-collapse: collapse;
+  border: 1px solid var(--grid-border-color);
+  line-height: 0;
+}
+
+.grid-table td {
+  padding: 0;
+}
+
+.grid-button {
+  border-radius: 0;
+  padding: 0;
+  border: 1px solid var(--grid-border-color);
+  background-color: #fff;
+  width: 50px;
+  height: 50px;
+  outline: none;
+  cursor: pointer;
+}
+
+.grid-button--Wall {
+  background-color: #1e789a;
+}
+
+.grid-button--StartCell {
+  background-color: #d6ffc8;
+  cursor: default;
+}
+
+.grid-button--EndCell {
+  background-color: #e21616;
+  cursor: default;
+}
+
+.grid-button--AnswerCell {
+  background-color: #c8dcff;
+  cursor: default;
+}

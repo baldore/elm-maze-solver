@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charSet="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>elm-webpack-starter</title>
+    <meta name="description" content="Elm Webpack Starter"/>
+    <meta name="author" content="Peter Morawiec"/>
+
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <div id="main"></div>
+
+    <script type="text/javascript" src="/_compile/src/elm/Main.elm"></script>
+
+    <!-- Removes splash and starts elm app. -->
+    <script type="text/javascript">
+            while (document.body.firstChild) {
+                    document.body.removeChild(document.body.firstChild);
+            }
+            runElmProgram();
+    </script>
+  </body>
+</html>
